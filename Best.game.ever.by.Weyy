@@ -20,3 +20,91 @@ public class PlayerController : MonoBehaviour
         bullet.GetComponent<Rigidbody2D>().velocity = Vector2.right * bulletSpeed;
     }
 }
+2. Bullet.cs (zet dit op je bullet prefab)
+csharp
+Kopiëren
+Bewerken
+using UnityEngine;
+
+public class Bullet : MonoBehaviour
+{
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            GameManager.instance.AddScore(1);
+            Destroy(other.gameObject);
+            Destroy(gameObject);
+        }
+    }
+
+    void Update()
+    {
+        if (transform.position.x > 20) // buiten beeld? weg ermee
+            Destroy(gameObject);
+    }
+}
+3. EnemySpawner.cs (zet op empty GameObject)
+csharp
+Kopiëren
+Bewerken
+using UnityEngine;
+
+public class EnemySpawner : MonoBehaviour
+{
+    public GameObject enemyPrefab;
+    public float spawnInterval = 2f;
+
+    void Start()
+    {
+        InvokeRepeating("SpawnEnemy", 1f, spawnInterval);
+    }
+
+    void SpawnEnemy()
+    {
+        Vector2 spawnPos = new Vector2(10f, Random.Range(-4f, 4f));
+        Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+    }
+}
+4. Enemy.cs (zet op enemy prefab)
+csharp
+Kopiëren
+Bewerken
+using UnityEngine;
+
+public class Enemy : MonoBehaviour
+{
+    public float moveSpeed = 2f;
+
+    void Update()
+    {
+        transform.Translate(Vector2.left * moveSpeed * Time.deltaTime);
+
+        if (transform.position.x < -10f)
+            Destroy(gameObject);
+    }
+}
+5. GameManager.cs (zet op GameManager GameObject)
+csharp
+Kopiëren
+Bewerken
+using UnityEngine;
+using UnityEngine.UI;
+
+public class GameManager : MonoBehaviour
+{
+    public static GameManager instance;
+    public int score = 0;
+    public Text scoreText;
+
+    void Awake()
+    {
+        instance = this;
+    }
+
+    public void AddScore(int amount)
+    {
+        score += amount;
+        scoreText.text = "Score: " + score;
+    }
+
