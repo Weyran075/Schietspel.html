@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>2D Schietspelletje</title>
+<style>
+body {
+margin: 0;
+background: #111;
+overflow: hidden;
+}
+canvas {
+display: block;
+background: #222;
+}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="600" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const speler = {
+x: canvas.width / 2 - 15,
+y: canvas.height - 50,
+width: 30,
+height: 30,
+snelheid: 5,
+kleur: "lime"
+};
+
+const kogels = [];
+const kogelSnelheid = 7;
+
+const toetsen = {
+links: false,
+rechts: false,
+schieten: false
+};
+
+document.addEventListener("keydown", (e) => {
+if (e.code === "ArrowLeft") toetsen.links = true;
+if (e.code === "ArrowRight") toetsen.rechts = true;
+if (e.code === "Space") toetsen.schieten = true;
+});
+
+document.addEventListener("keyup", (e) => {
+if (e.code === "ArrowLeft") toetsen.links = false;
+if (e.code === "ArrowRight") toetsen.rechts = false;
+if (e.code === "Space") toetsen.schieten = false;
+});
+
+function update() {
+// Bewegen
+if (toetsen.links && speler.x > 0) speler.x -= speler.snelheid;
+if (toetsen.rechts && speler.x + speler.width < canvas.width) speler.x += speler.snelheid;
+
+// Schieten
+if (toetsen.schieten) {
+// Schiet alleen als er nog geen kogel boven de speler
+if (!kogels.some(k => k.y < speler.y - 40)) {
+kogels.push({
+x: speler.x + speler.width / 2 - 2,
+y: speler.y,
+width: 4,
+height: 10,
+kleur: "red"
+});
+}
+}
+
+// Update kogels
+for (let i = 0; i < kogels.length; i++) {
+kogels[i].y -= kogelSnelheid;
+if (kogels[i].y < 0) {
+kogels.splice(i, 1);
+i--;
+}
+}
+}
+
+function tekenen() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+// Teken speler
+ctx.fillStyle = speler.kleur;
+ctx.fillRect(speler.x, speler.y, speler.width, speler.height);
+
+// Teken kogels
+for (let kogel of kogels) {
+ctx.fillStyle = kogel.kleur;
+ctx.fillRect(kogel.x, kogel.y, kogel.width, kogel.height);
+}
+}
+
+function gameLoop() {
+update();
+tekenen();
+requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+</body>
+</html>
