@@ -1,0 +1,22 @@
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    public GameObject bulletPrefab;
+    public Transform shootPoint;
+    public float bulletSpeed = 10f;
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Shoot();
+        }
+    }
+
+    void Shoot()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, shootPoint.position, Quaternion.identity);
+        bullet.GetComponent<Rigidbody2D>().velocity = Vector2.right * bulletSpeed;
+    }
+}
